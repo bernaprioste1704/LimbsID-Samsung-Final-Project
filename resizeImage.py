@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[222]:
+# In[35]:
 
 
 import matplotlib.pyplot as plt
@@ -9,15 +9,16 @@ import pandas as pd
 import cv2
 import numpy as np
 from ultralytics import YOLO 
+import winsound
 
 
-# In[223]:
+# In[36]:
 
 
-plt.imshow(cv2.imread("Datasets/images/000003072.jpg"))
+#plt.imshow(cv2.imread("Datasets/images/000003072.jpg"))
 
 
-# In[224]:
+# In[37]:
 
 
 def resize_with_padding(points,image, target_size=(224, 224), padding_color=(0, 0, 0)):
@@ -42,11 +43,14 @@ def resize_with_padding(points,image, target_size=(224, 224), padding_color=(0, 
 
     # Place the resized image onto the padded canvas
     padded_image[y_offset:y_offset + new_h, x_offset:x_offset + new_w] = resized
+    
+    #lambdas to reverse x and y
+    reverse = lambda lm,bm,x, y: (int((x - (target_w - new_w) // 2) / scale)+lm, int((y - (target_h - new_h) // 2) / scale)+bm)
+    
+    return padded_image,points,reverse
 
-    return padded_image,points
 
-
-# In[225]:
+# In[38]:
 
 
 def get_persons(image,points):
@@ -73,7 +77,7 @@ def get_persons(image,points):
     return crop
 
 
-# In[226]:
+# In[39]:
 
 
 def transform_data(name,points):
@@ -94,56 +98,73 @@ def transform_data(name,points):
 
     # Adjust points coordinates
     points = [(x - leftmost, y - bottommost) for x, y in points]
-
-    return resize_with_padding(points,image)
+    padded_image,new_points,reverse = resize_with_padding(points,image)
+    reverse_complete = lambda x, y: reverse(leftmost, bottommost,x, y )
+    return padded_image,new_points,reverse_complete
     # Plot image
     
 
 
-# In[227]:
+# In[13]:
 
 
 
 
-df = pd.read_csv('./Datasets/mpii_human_pose.csv')
-df = df[df["NAME"]=="000003072.jpg"]
-# Load image using OpenCV (convert BGR to RGB for Matplotlib)
 
-keypoints = [
-    ("r ankle_X", "r ankle_Y"),
-    ("r knee_X", "r knee_Y"),
-    ("r hip_X", "r hip_Y"),
-    ("l hip_X", "l hip_Y"),
-    ("l knee_X", "l knee_Y"),
-    ("l ankle_X", "l ankle_Y"),
-    ("pelvis_X", "pelvis_Y"),
-    ("thorax_X", "thorax_Y"),
-    ("upper neck_X", "upper neck_Y"),
-    ("head top_X", "head top_Y"),
-    ("r wrist_X", "r wrist_Y"),
-    ("r elbow_X", "r elbow_Y"),
-    ("r shoulder_X", "r shoulder_Y"),
-    ("l shoulder_X", "l shoulder_Y"),
-    ("l elbow_X", "l elbow_Y"),
-    ("l wrist_X", "l wrist_Y")
-]
-
-# Select the first row (example: first image)
-row = df.iloc[0]  # Change index for other images
-
-# Convert keypoints into a list of (x, y) tuples
-points = [(int(row[x]), int(row[y])) for x, y in keypoints]
-
-image,points = transform_data("000003072.jpg",points)
-# Plot image
-plt.imshow(image)
-for (x, y) in points:
-    plt.scatter(x, y, color="red", s=30)  # Red points
-
-plt.show()
+# In[ ]:
 
 
-# In[228]:
+
+#
+#df = pd.read_csv('./Datasets/mpii_human_pose.csv')
+#df = df[df["NAME"]=="000003072.jpg"]
+## Load image using OpenCV (convert BGR to RGB for Matplotlib)
+#
+#keypoints = [
+#    ("r ankle_X", "r ankle_Y"),
+#    ("r knee_X", "r knee_Y"),
+#    ("r hip_X", "r hip_Y"),
+#    ("l hip_X", "l hip_Y"),
+#    ("l knee_X", "l knee_Y"),
+#    ("l ankle_X", "l ankle_Y"),
+#    ("pelvis_X", "pelvis_Y"),
+#    ("thorax_X", "thorax_Y"),
+#    ("upper neck_X", "upper neck_Y"),
+#    ("head top_X", "head top_Y"),
+#    ("r wrist_X", "r wrist_Y"),
+#    ("r elbow_X", "r elbow_Y"),
+#    ("r shoulder_X", "r shoulder_Y"),
+#    ("l shoulder_X", "l shoulder_Y"),
+#    ("l elbow_X", "l elbow_Y"),
+#    ("l wrist_X", "l wrist_Y")
+#]
+#
+## Select the first row (example: first image)
+#row = df.iloc[0]  # Change index for other images
+#
+## Convert keypoints into a list of (x, y) tuples
+#points = [(int(row[x]), int(row[y])) for x, y in keypoints]
+#image,points,reverse = transform_data("000003072.jpg",points)
+## Plot image
+#plt.imshow(image)
+#for (x, y) in points:
+#    plt.scatter(x, y, color="red", s=30)  # Red points
+#
+#plt.show()
+
+
+# In[41]:
+
+
+#original_points = [reverse(x,y) for x, y in points]
+#plt.imshow(cv2.imread("Datasets/images/000003072.jpg"))
+#for (x, y) in original_points:
+#    plt.scatter(x, y, color="red", s=30)  # Red points
+#
+#plt.show()
+
+
+# In[42]:
 
 
 # change the dataset using a function that will return the image with the alterations and the new points
@@ -176,36 +197,51 @@ def process_row(row):
     return row
 
 
-# In[ ]:
+# In[43]:
 
 
-def process_dataset():
-    df = pd.read_csv('./Datasets/mpii_human_pose.csv')
+def process_dataset(name):
+    df = pd.read_csv(name)
     df= df[(df != -1).all(axis=1)]
-    df = df.head(5000).apply(process_row, axis=1)
-
+    df = df[5000:].apply(process_row, axis=1)
     plt.imshow(df.iloc[0]["image"])
     #takes a long TIME !! for me 1h 30 min
-    df.to_pickle('dataset5000.pkl')
+
+    df.to_pickle('dataset'+str(df.shape[0])+'.pkl')
+    
+    #ring an alarm when the process is done
+    duration = 1000  # milliseconds
+    freq = 600  # Hz
+    for _ in range(100):  # Beep 10 times
+        winsound.Beep(freq, duration)
+    return df
+    
+    
 
 
-# In[230]:
+# In[44]:
 
 
-#row = df.iloc[5]  # Change index for other images
-# Convert keypoints into a list of (x, y) tuples
+#newDF = process_dataset()
+
+
+# In[45]:
+
+
+#row = newDF.iloc[5]  # Change index for other images
+## Convert keypoints into a list of (x, y) tuples
 #points = [(int(row[x]), int(row[y])) for x, y in keypoints]
 #plt.imshow(row["image"])
 #for (x, y) in points:
 #    plt.scatter(x, y, color="red", s=30)  # Red points
 
 
-# In[232]:
+# In[46]:
 
 
 #get all rows that have image null
-#df_nulls = df[df["image"].isnull()]
-# count how mutch image nulls it has
+#df_nulls = newDF[newDF["image"].isnull()]
+## count how mutch image nulls it has
 #print(df_nulls.shape)
 #row = df_nulls.iloc[0]  # Change index for other images
 #points = [(int(row[x]), int(row[y])) for x, y in keypoints]
@@ -213,4 +249,13 @@ def process_dataset():
 #plt.imshow(cv2.imread("./Datasets/images/"+row["NAME"]))
 #for (x, y) in points:
 #    plt.scatter(x, y, color="red", s=30)
+
+
+# In[47]:
+
+
+#df5000 = pd.read_pickle('dataset5000.pkl')
+#df6231 = pd.read_pickle('dataset6231.pkl')
+#df = pd.concat([df5000, df6231], ignore_index=True)
+#df.to_pickle('dataset11231.pkl')
 
