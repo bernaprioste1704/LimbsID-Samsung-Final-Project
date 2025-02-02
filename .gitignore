@@ -2,3 +2,11 @@
 .DS_Store
 yolov8l.pt
 yolov8n.pt
+trained_models/posev000121.pth
+trained_models/posev00077.pth
+trained_models/posev00254.pth
+trained_models/posev0207.pth
+trained_models/posev000121.pth
+trained_models/posev00254.pth
+trained_models/posev00077.pth
+/trained_models
