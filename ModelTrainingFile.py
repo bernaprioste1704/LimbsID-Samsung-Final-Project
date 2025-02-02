@@ -48,6 +48,7 @@ val_loader = data.DataLoader(val_dataset, batch_size=32, shuffle=False)
 
 
 
+
 class PoseNet(nn.Module):
     def __init__(self):
         super(PoseNet, self).__init__()
@@ -70,22 +71,27 @@ class PoseNet(nn.Module):
             nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(256),
             nn.ReLU(),
+            nn.MaxPool2d(2, 2),  # 28x28
+
+            nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
             nn.AdaptiveAvgPool2d((7, 7))  # Adaptive pooling to make output size consistent
         )
 
         self.fc = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(256 * 7 * 7, 512),
+            nn.Linear(512 * 7 * 7, 512),
             nn.ReLU(),
-            nn.Dropout(0.4),  # Increased dropout to prevent overfitting
+            nn.Dropout(0.50),  # Increased dropout to prevent overfitting
             nn.Linear(512, 32),
-            nn.Tanh()  # Normalizing keypoint predictions
+            nn.Sigmoid()  # Normalizing keypoint predictions
         )
-      
+
     def forward(self, x):
-      x = self.conv(x)
-      x = self.fc(x)
-      return x
+        x = self.conv(x)
+        x = self.fc(x)
+        return x
 
 
 class ModelTraining:
