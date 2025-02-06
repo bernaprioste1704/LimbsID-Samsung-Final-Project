@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[35]:
+# In[58]:
 
 
 import matplotlib.pyplot as plt
@@ -12,13 +12,13 @@ from ultralytics import YOLO
 import winsound
 
 
-# In[36]:
+# In[59]:
 
 
 #plt.imshow(cv2.imread("Datasets/images/000003072.jpg"))
 
 
-# In[37]:
+# In[60]:
 
 
 def resize_with_padding(points,image, target_size=(224, 224), padding_color=(0, 0, 0)):
@@ -50,7 +50,7 @@ def resize_with_padding(points,image, target_size=(224, 224), padding_color=(0, 
     return padded_image,points,reverse
 
 
-# In[38]:
+# In[61]:
 
 
 def get_persons(image,points):
@@ -77,7 +77,7 @@ def get_persons(image,points):
     return crop
 
 
-# In[39]:
+# In[62]:
 
 
 def transform_data(name,points):
@@ -111,34 +111,33 @@ def transform_data(name,points):
 
 
 
-# In[ ]:
+# In[63]:
 
 
 
-#
-#df = pd.read_csv('./Datasets/mpii_human_pose.csv')
-#df = df[df["NAME"]=="000003072.jpg"]
-## Load image using OpenCV (convert BGR to RGB for Matplotlib)
-#
-#keypoints = [
-#    ("r ankle_X", "r ankle_Y"),
-#    ("r knee_X", "r knee_Y"),
-#    ("r hip_X", "r hip_Y"),
-#    ("l hip_X", "l hip_Y"),
-#    ("l knee_X", "l knee_Y"),
-#    ("l ankle_X", "l ankle_Y"),
-#    ("pelvis_X", "pelvis_Y"),
-#    ("thorax_X", "thorax_Y"),
-#    ("upper neck_X", "upper neck_Y"),
-#    ("head top_X", "head top_Y"),
-#    ("r wrist_X", "r wrist_Y"),
-#    ("r elbow_X", "r elbow_Y"),
-#    ("r shoulder_X", "r shoulder_Y"),
-#    ("l shoulder_X", "l shoulder_Y"),
-#    ("l elbow_X", "l elbow_Y"),
-#    ("l wrist_X", "l wrist_Y")
-#]
-#
+df = pd.read_csv('./Datasets/mpii_human_pose.csv')
+df = df[df["NAME"]=="000003072.jpg"]
+# Load image using OpenCV (convert BGR to RGB for Matplotlib)
+
+keypoints = [
+    ("r ankle_X", "r ankle_Y"),
+    ("r knee_X", "r knee_Y"),
+    ("r hip_X", "r hip_Y"),
+    ("l hip_X", "l hip_Y"),
+    ("l knee_X", "l knee_Y"),
+    ("l ankle_X", "l ankle_Y"),
+    ("pelvis_X", "pelvis_Y"),
+    ("thorax_X", "thorax_Y"),
+    ("upper neck_X", "upper neck_Y"),
+    ("head top_X", "head top_Y"),
+    ("r wrist_X", "r wrist_Y"),
+    ("r elbow_X", "r elbow_Y"),
+    ("r shoulder_X", "r shoulder_Y"),
+    ("l shoulder_X", "l shoulder_Y"),
+    ("l elbow_X", "l elbow_Y"),
+    ("l wrist_X", "l wrist_Y")
+]
+
 ## Select the first row (example: first image)
 #row = df.iloc[0]  # Change index for other images
 #
@@ -153,7 +152,7 @@ def transform_data(name,points):
 #plt.show()
 
 
-# In[41]:
+# In[64]:
 
 
 #original_points = [reverse(x,y) for x, y in points]
@@ -164,14 +163,14 @@ def transform_data(name,points):
 #plt.show()
 
 
-# In[42]:
+# In[65]:
 
 
 # change the dataset using a function that will return the image with the alterations and the new points
 def process_row(row):
     points = [(int(row[x]), int(row[y])) for x, y in keypoints]
     try:
-        image, points = transform_data(row["NAME"], points)
+        image, points,_ = transform_data(row["NAME"], points)
     except Exception as e:
         print(f"Error processing row {row['ID']}: {e}")
         row["image"] = None
@@ -197,7 +196,7 @@ def process_row(row):
     return row
 
 
-# In[43]:
+# In[66]:
 
 
 def process_dataset(name):
@@ -219,13 +218,13 @@ def process_dataset(name):
     
 
 
-# In[44]:
+# In[ ]:
 
 
-#newDF = process_dataset()
+#newDF = process_dataset("./Datasets/mpii_human_pose.csv")
 
 
-# In[45]:
+# In[ ]:
 
 
 #row = newDF.iloc[5]  # Change index for other images
@@ -236,7 +235,7 @@ def process_dataset(name):
 #    plt.scatter(x, y, color="red", s=30)  # Red points
 
 
-# In[46]:
+# In[ ]:
 
 
 #get all rows that have image null
