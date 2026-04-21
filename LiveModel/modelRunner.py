@@ -3,7 +3,7 @@ import cv2
 import time
 import math as m
 import time
-#import mediapipe as mp
+import mediapipe as mp
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
