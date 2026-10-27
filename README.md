@@ -143,5 +143,6 @@ These scripts are kept exactly as they were during the project:
 
 - Bernardo Delgado Prioste
 - Miguel Cid Flor
+- Miguel Nunes
 
 Built as part of the **Samsung Innovation Campus** programme. See [docs/references.md](docs/references.md) for the papers that guided the project.
