@@ -1,0 +1,24 @@
+[project]
+name = "limbsid"
+version = "1.0.0"
+description = "LimbsID - human pose estimation (16 body keypoints) with a custom PyTorch CNN, trained on MPII Human Pose."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch>=2.4",
+    "torchvision>=0.19",
+    "numpy",
+    "pandas",
+    "opencv-python",
+    "mediapipe==0.10.21",  # last versions with mp.solutions (used by LiveModel)
+    "ultralytics",
+    "matplotlib",
+    "seaborn",
+    "scikit-learn",
+    "pillow",
+    "jupyterlab",
+    "ipykernel",
+]
+
+[tool.uv]
+package = false

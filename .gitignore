@@ -1,20 +1,23 @@
-/Datasets/images
+# Python / environment
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
 .DS_Store
-yolov8l.pt
-yolov8n.pt
-trained_models/posev000121.pth
-trained_models/posev00077.pth
-trained_models/posev00254.pth
-trained_models/posev0207.pth
-trained_models/posev000121.pth
-trained_models/posev00254.pth
-trained_models/posev00077.pth
-/trained_models
+
+# Large / local data (download separately - see README)
+/Datasets/images
+/test_images
+*.pkl
+yolov8*.pt
+
+# Model checkpoints (only the published one is tracked)
+/trained_models/*
+!/trained_models/posev00072.pth
+
+# Local test images
 standing.jpg
-c.jpeg
+image.jpeg
 a.jpg
 b.jpg
-dataset11231.pkl
-dataset5000.pkl
-image.jpeg
-/test_images
+c.jpeg
